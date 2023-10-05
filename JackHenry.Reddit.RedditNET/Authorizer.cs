@@ -3,7 +3,7 @@ using Reddit.AuthTokenRetriever.EventArgs;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace JackHenry.Reddit.ConsoleApp;
+namespace JackHenry.Reddit.RedditNET;
 
 public class Authorizer
 {

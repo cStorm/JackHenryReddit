@@ -6,12 +6,12 @@ Create an OAuth app here: https://www.reddit.com/prefs/apps
 
 Get API refresh_token:
 ```shell
-> dotnet run  8080 <api-app-id>
+> dotnet run  auth <api-app-id> --port=8080
 ```
 
 Monitor specific subreddit:
 ```shell
-> dotnet run  AskReddit <api-app-id> <api-refresh-token>
+> dotnet run  watch AskReddit <api-app-id> --refresh <api-refresh-token>
 ```
 
 ## Programming Assignment (Requirements)

@@ -2,7 +2,7 @@
 using Reddit.Controllers;
 using Reddit.Controllers.EventArgs;
 
-namespace JackHenry.Reddit.ConsoleApp;
+namespace JackHenry.Reddit.RedditNET;
 
 public class RedditWatcher : IDisposable
 {

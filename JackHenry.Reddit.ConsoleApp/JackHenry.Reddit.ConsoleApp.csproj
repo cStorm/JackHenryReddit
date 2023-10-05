@@ -8,12 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reddit" Version="1.5.2" />
-    <PackageReference Include="Reddit.AuthTokenRetrieverLib" Version="1.5.2" />
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JackHenry.Reddit\JackHenry.Reddit.csproj" />
+	  <ProjectReference Include="..\JackHenry.Reddit\JackHenry.Reddit.csproj" />
+	  <ProjectReference Include="..\JackHenry.Reddit.RedditNET\JackHenry.Reddit.RedditNET.csproj" />
   </ItemGroup>
 
 </Project>
