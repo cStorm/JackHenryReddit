@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using JackHenry.Reddit.RedditNET;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace JackHenry.Reddit.ConsoleApp;
 
@@ -18,13 +19,19 @@ public class Watch : ICommand
     [Option('r', "refresh", MetaValue="refresh-token", Required = true)]
     public string? RefreshToken { get; set; }
 
-    public void Execute()
+    public void Configure(ServiceCollection services)
     {
-        if (Subreddit == null) throw new ArgumentNullException(nameof(Subreddit));
         if (AppId == null) throw new ArgumentNullException(nameof(AppId));
         if (RefreshToken == null) throw new ArgumentNullException(nameof(RefreshToken));
 
-        using RedditWatcher watcher = new(AppId, AppSecret, RefreshToken);
+        services.AddTransient<RedditWatcher>(sp => new(AppId, AppSecret, RefreshToken));
+    }
+
+    public void Execute(ServiceProvider serviceProvider)
+    {
+        if (Subreddit == null) throw new ArgumentNullException(nameof(Subreddit));
+
+        using RedditWatcher watcher = serviceProvider.GetRequiredService<RedditWatcher>();
 
         (string name, string description) = watcher.Start(Subreddit);
         Console.WriteLine($"Now watching {name}");

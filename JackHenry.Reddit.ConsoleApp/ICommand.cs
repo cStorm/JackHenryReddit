@@ -1,6 +1,9 @@
-﻿namespace JackHenry.Reddit.ConsoleApp;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace JackHenry.Reddit.ConsoleApp;
 
 public interface ICommand
 {
-    void Execute();
+    void Configure(ServiceCollection services);
+    void Execute(ServiceProvider serviceProvider);
 }
