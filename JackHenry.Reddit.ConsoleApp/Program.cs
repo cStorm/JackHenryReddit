@@ -1,16 +1,14 @@
 ﻿using CommandLine;
+using JackHenry.Reddit.ConsoleApp;
 using Microsoft.Extensions.DependencyInjection;
-using ICommand = JackHenry.Reddit.ConsoleApp.ICommand;
+
+DependencyInjector di = new();
 
 ServiceCollection services = new();
+di.Inject(services);
 
-Parser.Default.ParseArguments(args, GetImplementations<ICommand>().ToArray())
+Parser.Default.ParseArguments(args, di.GetImplementers<ICommand>().ToArray())
     .WithParsed<ICommand>(c => ExecuteCommand(c, services));
-
-static IEnumerable<Type> GetImplementations<T>()
-{
-    return typeof(Program).Module.GetTypes().Where(t => t.IsAssignableTo(typeof(T)));
-}
 
 static void ExecuteCommand(ICommand command, ServiceCollection services)
 {

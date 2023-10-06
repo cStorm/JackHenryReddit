@@ -1,6 +1,6 @@
 ﻿namespace JackHenry.Reddit;
 
-public record PostSummary(string Username);
+public record PostSummary(string Username, string Title);
 
 
 public interface IRedditAggregationService

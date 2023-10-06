@@ -16,7 +16,7 @@ public class Watch : ICommand
     [Value(2, MetaName = "app-secret")]
     public string? AppSecret { get; set; }
 
-    [Option('r', "refresh", MetaValue="refresh-token", Required = true)]
+    [Option('r', "refresh", MetaValue = "refresh-token", Required = true)]
     public string? RefreshToken { get; set; }
 
     public void Configure(ServiceCollection services)
@@ -24,7 +24,7 @@ public class Watch : ICommand
         if (AppId == null) throw new ArgumentNullException(nameof(AppId));
         if (RefreshToken == null) throw new ArgumentNullException(nameof(RefreshToken));
 
-        services.AddTransient<RedditWatcher>(sp => new(AppId, AppSecret, RefreshToken));
+        services.AddTransient<IRedditReader>(sp => new RedditClientReader(AppId, AppSecret, RefreshToken));
     }
 
     public void Execute(ServiceProvider serviceProvider)
@@ -32,10 +32,21 @@ public class Watch : ICommand
         if (Subreddit == null) throw new ArgumentNullException(nameof(Subreddit));
 
         using RedditWatcher watcher = serviceProvider.GetRequiredService<RedditWatcher>();
+        watcher.PostsAdded += (sender, e) =>
+        {
+            foreach (var post in e.Items)
+                Console.WriteLine("New Post by " + post.Username + ": " + post.Title);
+        };
+        watcher.ActiveUsersChanged += (sender, e) =>
+        {
+            int i = 0;
+            foreach (string? un in e.Items.Take(5))
+                Console.WriteLine($"#{++i} {un}");
+        };
 
-        (string name, string description) = watcher.Start(Subreddit);
-        Console.WriteLine($"Now watching {name}");
-        Console.WriteLine(description);
+        SubredditSummary subreddit = watcher.Start(Subreddit);
+        Console.WriteLine($"Now watching {subreddit.Name}");
+        Console.WriteLine(subreddit.Description);
 
         Console.WriteLine("Press ENTER to quit...");
         Console.ReadLine();
