@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using JackHenry.Reddit.RedditNET;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace JackHenry.Reddit.ConsoleApp;
 
@@ -11,6 +12,9 @@ public class DependencyInjector
 
     public void Inject(ServiceCollection services)
     {
+        services.AddTransient<Authorizer>();
+        services.AddTransient<IRedditReader, RedditClientReader>();
+
         services.AddTransient<RedditWatcher>();
     }
 }

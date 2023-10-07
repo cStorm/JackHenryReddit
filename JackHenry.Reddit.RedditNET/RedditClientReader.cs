@@ -8,9 +8,9 @@ public class RedditClientReader : IRedditReader
     private readonly RedditClient _client;
     private Subreddit? _sub;
 
-    public RedditClientReader(string appId, string? appSecret, string refreshToken)
+    public RedditClientReader(ApiCredentials credentials)
     {
-        _client = new(appId, refreshToken, appSecret);
+        _client = new(credentials.AppId, credentials.RefreshToken, credentials.AppSecret);
     }
 
     public event EventHandler<PostsEventArgs>? PostsAdded;

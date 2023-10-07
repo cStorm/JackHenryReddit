@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JackHenry.Reddit.ConsoleApp\JackHenry.Reddit.ConsoleApp.csproj" />
     <ProjectReference Include="..\JackHenry.Reddit\JackHenry.Reddit.csproj" />
   </ItemGroup>
 

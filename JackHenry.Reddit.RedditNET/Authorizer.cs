@@ -4,20 +4,19 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace JackHenry.Reddit.RedditNET;
-
 public class Authorizer
 {
     private readonly AuthTokenRetrieverLib _retriever;
     private AuthSuccessEventArgs? _success = null;
 
-    public Authorizer(int port, string appId, string? appSecret = null)
+    public Authorizer(OAuthRedirect redirect, ApiCredentials credentials)
     {
-        RedirectUri = $"http://127.0.0.1:{port}/Reddit.NET/oauthRedirect";
-        _retriever = new AuthTokenRetrieverLib(appId, port, appSecret: appSecret);
+        RedirectUri = redirect.GetUrl();
+        _retriever = new AuthTokenRetrieverLib(credentials.AppId, redirect.Port, appSecret: credentials.AppSecret);
         _retriever.AuthSuccess += OnSuccess;
     }
 
-    public string RedirectUri { get; init; }
+    public string RedirectUri { get; }
     public string RefreshToken => _retriever.RefreshToken;
 
     public void Authorize()

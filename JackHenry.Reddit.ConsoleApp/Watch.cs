@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using JackHenry.Reddit.RedditNET;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JackHenry.Reddit.ConsoleApp;
@@ -24,7 +23,7 @@ public class Watch : ICommand
         if (AppId == null) throw new ArgumentNullException(nameof(AppId));
         if (RefreshToken == null) throw new ArgumentNullException(nameof(RefreshToken));
 
-        services.AddTransient<IRedditReader>(sp => new RedditClientReader(AppId, AppSecret, RefreshToken));
+        services.AddSingleton(new ApiCredentials(AppId, AppSecret, RefreshToken));
     }
 
     public void Execute(ServiceProvider serviceProvider)

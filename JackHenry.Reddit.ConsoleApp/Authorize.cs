@@ -20,7 +20,8 @@ public class Authorize : ICommand
     {
         if (AppId == null) throw new ArgumentNullException(nameof(AppId));
 
-        services.AddTransient<Authorizer>(sp => new(Port, AppId, AppSecret));
+        services.AddSingleton(sp => new OAuthRedirect() { Port = Port });
+        services.AddSingleton(new ApiCredentials(AppId, AppSecret, null));
     }
 
     public void Execute(ServiceProvider serviceProvider)
