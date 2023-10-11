@@ -30,20 +30,9 @@ public class Watch : ICommand
     {
         if (Subreddit == null) throw new ArgumentNullException(nameof(Subreddit));
 
-        using RedditWatcher watcher = serviceProvider.GetRequiredService<RedditWatcher>();
-        watcher.PostsAdded += (sender, e) =>
-        {
-            foreach (var post in e.Items)
-                Console.WriteLine("New Post by " + post.Username + ": " + post.Title);
-        };
-        watcher.ActiveUsersChanged += (sender, e) =>
-        {
-            int i = 0;
-            foreach (string? un in e.Items.Take(5))
-                Console.WriteLine($"#{++i} {un}");
-        };
+        var service = serviceProvider.GetRequiredService<IRedditAggregator>();
 
-        SubredditSummary subreddit = watcher.Start(Subreddit);
+        SubredditSummary subreddit = service.Start(Subreddit);
         Console.WriteLine($"Now watching {subreddit.Name}");
         Console.WriteLine(subreddit.Description);
 

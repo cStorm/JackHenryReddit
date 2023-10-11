@@ -14,6 +14,6 @@ static void ExecuteCommand(ICommand command, ServiceCollection services)
 {
     command.Configure(services);
 
-    ServiceProvider serviceProvider = services.BuildServiceProvider();
+    using ServiceProvider serviceProvider = services.BuildServiceProvider();
     command.Execute(serviceProvider);
 }

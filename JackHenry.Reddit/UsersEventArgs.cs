@@ -1,8 +1,8 @@
 ﻿namespace JackHenry.Reddit;
 
-public class UsersEventArgs : ListEventArgs<string>
+public class UsersEventArgs : ListEventArgs<UserHandle>
 {
-    public UsersEventArgs(IEnumerable<string> items) : base(items)
+    public UsersEventArgs(IEnumerable<UserHandle> items) : base(items)
     {
     }
 }

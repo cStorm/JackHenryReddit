@@ -13,7 +13,7 @@ public class UserDataTracker
             _counts.Add(key, 1);
     }
 
-    public IEnumerable<string> MostActive() => _counts.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key);
+    public IEnumerable<string> MostActive() => _counts.OrderByDescending(kvp => kvp.Value).Select(kvp => kvp.Key);
 }
 
 public class ChangedEventArgs<T> : EventArgs { }

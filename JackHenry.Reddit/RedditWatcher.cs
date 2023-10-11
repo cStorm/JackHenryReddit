@@ -3,26 +3,26 @@
 public class RedditWatcher : IDisposable
 {
     private readonly IRedditReader _reader;
+    private readonly List<IFullObserver> _observers = new();
 
     public RedditWatcher(IRedditReader reader)
     {
-        _reader = reader;
+        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
     }
 
-    public event EventHandler<PostsEventArgs>? PostsAdded;
-    public event EventHandler<UsersEventArgs>? ActiveUsersChanged;
+    public void Listen(IFullObserver observer)
+    {
+        _observers.Add(observer);
+    }
 
     public SubredditSummary Start(string subName)
     {
         SubredditSummary sub = _reader.GetSubreddit(subName);
 
-        UserDataTracker tracker = new();
         _reader.PostsAdded += (object? sender, PostsEventArgs e) =>
         {
-            PostsAdded?.Invoke(this, e);
-            foreach (PostSummary post in e.Items)
-                tracker.AcknowledgePost(post);
-            ActiveUsersChanged?.Invoke(this, new(tracker.MostActive()));
+            foreach (IRedditObserver<PostSummary> observer in _observers)
+                observer.AcknowledgeItems(e.Items);
         };
         _reader.Start(subName);
 
