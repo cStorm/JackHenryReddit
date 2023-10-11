@@ -26,6 +26,9 @@ public class DependencyInjector
             s.Include(new TopUserAggregation(),
                       CreateReporter<UserHandle>((u, i) => $"#{i + 1} {u.Username}"),
                       5);
+            s.Include(new TopPostAggregation(),
+                      CreateReporter<PostSummary>((p, i) => $"#{i + 1} {p.UpvoteCount,5} - {p.Title}"),
+                      3);
             return s;
         });
 

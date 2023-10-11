@@ -24,6 +24,11 @@ public class RedditWatcher : IDisposable
             foreach (IRedditObserver<PostSummary> observer in _observers)
                 observer.AcknowledgeItems(e.Items);
         };
+        _reader.PostsUpdated += (object? sender, PostsEventArgs e) =>
+        {
+            foreach (IRedditObserver<PostSummary> observer in _observers)
+                observer.UpdateItems(e.Items);
+        };
         _reader.Start(subName);
 
         return sub;

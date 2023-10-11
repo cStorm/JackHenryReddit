@@ -1,10 +1,3 @@
 ﻿namespace JackHenry.Reddit;
 
-public record PostSummary(string Username, string Title);
-
-
-public interface IRedditAggregationService
-{
-    void AcknowledgePost(PostSummary post);
-    public IEnumerable<string> MostActive();
-}
+public record PostSummary(string Username, string Title, string Id = "", int UpvoteCount = 0);

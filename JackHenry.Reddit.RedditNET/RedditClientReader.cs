@@ -14,6 +14,7 @@ public class RedditClientReader : IRedditReader
     }
 
     public event EventHandler<PostsEventArgs>? PostsAdded;
+    public event EventHandler<PostsEventArgs>? PostsUpdated;
 
     public SubredditSummary GetSubreddit(string name)
     {
@@ -22,7 +23,7 @@ public class RedditClientReader : IRedditReader
     }
 
 
-    private static PostSummary CreatePostSummary(Post post) => new(post.Author, post.Title);
+    private static PostSummary CreatePostSummary(Post post) => new(post.Author, post.Title, post.Id, post.UpVotes);
 
     public void Start(string subName)
     {
@@ -31,7 +32,9 @@ public class RedditClientReader : IRedditReader
         _sub = _client.Subreddit(subName).About();
         _sub.Posts.NewUpdated += (sender, e) =>
         {
-            PostsAdded?.Invoke(this, new PostsEventArgs(e.Added.Select(CreatePostSummary)));
+            HashSet<Post> added = new(e.Added);
+            PostsAdded?.Invoke(this, new PostsEventArgs(added.Select(CreatePostSummary)));
+            PostsUpdated?.Invoke(this, new PostsEventArgs(e.NewPosts.Where(p => !added.Contains(p)).Select(CreatePostSummary)));
         };
         if (!_sub.Posts.MonitorNew())
             throw new InvalidOperationException("Expected monitored");
