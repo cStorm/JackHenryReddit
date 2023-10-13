@@ -2,7 +2,7 @@
 
 namespace JackHenry.Reddit.Api;
 
-public class PageReader<T, TNext>
+public class PageReader<T, TNext> : IPageReader<T>
 {
     private readonly Func<TNext?, IEnumerable<T>?> _readPage;
     private readonly Func<T, TNext> _getToken;

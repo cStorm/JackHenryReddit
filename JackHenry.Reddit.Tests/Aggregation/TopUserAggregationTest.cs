@@ -1,4 +1,6 @@
-﻿namespace JackHenry.Reddit.Tests.Aggregation;
+﻿using JackHenry.Reddit.Aggregation;
+
+namespace JackHenry.Reddit.Tests.Aggregation;
 
 public class TopUserAggregationTest
 {

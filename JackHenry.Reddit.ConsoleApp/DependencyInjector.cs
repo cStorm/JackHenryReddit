@@ -1,4 +1,5 @@
 ﻿using JackHenry.Reddit.Aggregation;
+using JackHenry.Reddit.Api;
 using JackHenry.Reddit.RedditNET;
 using JackHenry.Reddit.Reporting;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,8 @@ public class DependencyInjector
     {
         services.AddTransient<Authorizer>();
         services.AddTransient<IRedditReader, RedditClientReader>();
+        services.AddTransient<IRedditMonitor, RedditClientMonitor>();
+        //services.AddTransient<IRedditReader, RedditApiReader>();
 
         services.AddTransient<RedditAggregator>();
         services.AddTransient<IRedditAggregator>(sp =>

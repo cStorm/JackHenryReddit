@@ -1,4 +1,6 @@
-﻿namespace JackHenry.Reddit.Reporting;
+﻿using JackHenry.Reddit.Aggregation;
+
+namespace JackHenry.Reddit.Reporting;
 
 public class TextAggregationReporter<T> : IAggregationReporter<T>
 {

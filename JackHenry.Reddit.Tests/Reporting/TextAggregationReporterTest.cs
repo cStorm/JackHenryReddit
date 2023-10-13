@@ -1,4 +1,5 @@
-﻿using JackHenry.Reddit.Reporting;
+﻿using JackHenry.Reddit.Aggregation;
+using JackHenry.Reddit.Reporting;
 using Moq;
 
 namespace JackHenry.Reddit.Tests.Reporting;

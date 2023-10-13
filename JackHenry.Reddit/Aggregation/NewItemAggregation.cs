@@ -1,4 +1,4 @@
-﻿namespace JackHenry.Reddit;
+﻿namespace JackHenry.Reddit.Aggregation;
 
 public abstract class NewItemAggregation<T> : IAggregation<T>, IFullObserver
 {

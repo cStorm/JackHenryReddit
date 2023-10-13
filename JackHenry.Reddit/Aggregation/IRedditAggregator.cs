@@ -1,6 +1,6 @@
 ﻿using JackHenry.Reddit.Reporting;
 
-namespace JackHenry.Reddit;
+namespace JackHenry.Reddit.Aggregation;
 
 public interface IRedditAggregator
 {

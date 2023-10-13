@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using JackHenry.Reddit.Aggregation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JackHenry.Reddit.ConsoleApp;

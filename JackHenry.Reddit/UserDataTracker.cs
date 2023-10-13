@@ -15,11 +15,3 @@ public class UserDataTracker
 
     public IEnumerable<string> MostActive() => _counts.OrderByDescending(kvp => kvp.Value).Select(kvp => kvp.Key);
 }
-
-public class ChangedEventArgs<T> : EventArgs { }
-public interface IRedditMonitor : IDisposable
-{
-    event EventHandler<ChangedEventArgs<PostSummary>> PostChanged;
-    void Start(string subredditName);
-    void Stop(string subredditName);
-}

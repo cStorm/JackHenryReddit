@@ -1,4 +1,4 @@
-﻿namespace JackHenry.Reddit;
+﻿namespace JackHenry.Reddit.Aggregation;
 
 public class TopUserAggregation : IAggregation<UserHandle>, IFullObserver
 {
