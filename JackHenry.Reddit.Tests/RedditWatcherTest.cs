@@ -1,5 +1,4 @@
 ﻿using Moq;
-using System.Diagnostics.Tracing;
 
 namespace JackHenry.Reddit.Tests;
 
