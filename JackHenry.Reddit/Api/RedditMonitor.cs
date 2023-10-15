@@ -4,15 +4,19 @@ public class RedditMonitor : IRedditMonitor
 {
     private readonly IRedditReader _redditReader;
 
-    private string? _subreddit;
-    private DateTime? _oldest;
-    private Thread? _updateThread;
+    private CancellationTokenSource? _updateThread;
+    private Task? _task;
 
-    private readonly Dictionary<string, PostSummary> _posts = new();
+    private readonly ChangeDistributor<PostSummary, string> _distributor;
 
     public RedditMonitor(IRedditReader redditReader)
     {
         _redditReader = redditReader ?? throw new ArgumentNullException(nameof(redditReader));
+        _distributor = new(
+            post => post.Id,
+            posts => PostsAdded?.Invoke(this, new PostsEventArgs(posts)),
+            posts => PostsUpdated?.Invoke(this, new PostsEventArgs(posts))
+            );
     }
 
     public event EventHandler<PostsEventArgs>? PostsAdded;
@@ -22,74 +26,45 @@ public class RedditMonitor : IRedditMonitor
     {
         if (_updateThread != null) throw new InvalidOperationException("Already running");
 
-        _subreddit = subName;
-        _oldest = oldest;
-        MonitorPosts();
+        _updateThread = new();
+        _task = MonitorPostsAsync(subName, oldest, _updateThread.Token);
     }
 
-    private void MonitorPosts()
+    private async Task MonitorPostsAsync(string subreddit, DateTime? oldest, CancellationToken cancellationToken)
     {
-        _updateThread = new Thread(() =>
-        {
-            while (_updateThread != null)
-                try
-                {
-                    CheckPosts();
-                }
-                catch { }
-        });
-        _updateThread.Start();
-    }
-
-    private void CheckPosts()
-    {
-        (string? subreddit, DateTime? oldest) = (_subreddit, _oldest);
-        if (subreddit != null)
-        {
-            IIncrementalReader<PostSummary> incremental = _redditReader.GetLatestPosts(subreddit, _oldest);
-            while (!incremental.Done && _updateThread != null)
+        await Task.Yield();
+        while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                List<PostSummary> changed = new(), added = new();
-                foreach (PostSummary summary in incremental.Enumerate())
-                    if (UpdatePost(summary, out bool existed))
-                        changed.Add(summary);
-                    else if (!existed)
-                        added.Add(summary);
-                if (added.Count != 0)
-                    PostsAdded?.Invoke(this, new PostsEventArgs(added));
-                if (changed.Count != 0)
-                    PostsUpdated?.Invoke(this, new PostsEventArgs(changed));
+                await CheckPostsAsync(subreddit, oldest, cancellationToken);
             }
-        }
+            catch { }
     }
 
-    private bool UpdatePost(PostSummary latest, out bool existed)
+    private async Task CheckPostsAsync(string subreddit, DateTime? oldest, CancellationToken cancellationToken)
     {
-        if (_posts.TryGetValue(latest.Id, out PostSummary? summary))
+        List<Task> tasks = new();
+
+        IIncrementalReader<PostSummary> incremental = _redditReader.GetLatestPosts(subreddit, oldest);
+        while (!incremental.Done && !cancellationToken.IsCancellationRequested)
         {
-            existed = true;
-            if (!summary.Equals(latest))
-            {
-                _posts[latest.Id] = latest ?? throw new ArgumentNullException(nameof(latest));
-                return true;
-            }
+            List<PostSummary> posts = incremental.Enumerate().ToList();
+            Task distribute = _distributor.DistributeAsync(posts);
+            tasks.Add(distribute);
         }
-        else
-        {
-            existed = false;
-            _posts.Add(latest.Id, latest);
-        }
-        return false;
+
+        await Task.WhenAll(tasks);
     }
 
     public void Stop()
     {
         if (_updateThread == null) throw new InvalidOperationException("Not running");
 
-        (Thread? thread, _updateThread) = (_updateThread, null);
-        (_subreddit, _oldest) = (null, null);
-        thread?.Join();
-        _posts.Clear();
+        using CancellationTokenSource cancellation = _updateThread;
+        cancellation.Cancel();
+        _task?.Wait();
+        _distributor.Clear();
+        _updateThread = null;
     }
 
     public void Dispose()
