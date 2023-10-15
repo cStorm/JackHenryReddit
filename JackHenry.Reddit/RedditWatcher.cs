@@ -2,43 +2,30 @@
 
 public class RedditWatcher : IDisposable
 {
-    private readonly IRedditReader _reader;
-    private readonly IRedditMonitor _monitor;
-    private readonly List<IFullObserver> _observers = new();
+    private readonly DisposableProviderCache<Filter, IRedditMonitor> _monitorProvider;
 
-    public RedditWatcher(IRedditReader reader, IRedditMonitor monitor)
+    public RedditWatcher(Provider<IRedditMonitor> monitorProvider)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+        _monitorProvider = new(monitorProvider);
     }
 
-    public void Listen(IFullObserver observer)
+    public void Listen(Filter filter, IFullObserver observer)
     {
-        _observers.Add(observer);
+        bool created = _monitorProvider.CreateOrGet(filter, out var monitor);
+        //_observers.Add(observer);
+        monitor.PostsAdded += (object? sender, PostsEventArgs e) => observer.AcknowledgeItems(e.Items);
+        monitor.PostsUpdated += (object? sender, PostsEventArgs e) => observer.UpdateItems(e.Items);
+        if (created)
+            monitor.Start(filter.Subreddit, filter.Oldest);
     }
 
-    public SubredditSummary Start(string subName)
+    public void Start()
     {
-        SubredditSummary sub = _reader.GetSubreddit(subName);
-
-        _monitor.PostsAdded += (object? sender, PostsEventArgs e) =>
-        {
-            foreach (IRedditObserver<PostSummary> observer in _observers)
-                observer.AcknowledgeItems(e.Items);
-        };
-        _monitor.PostsUpdated += (object? sender, PostsEventArgs e) =>
-        {
-            foreach (IRedditObserver<PostSummary> observer in _observers)
-                observer.UpdateItems(e.Items);
-        };
-        _monitor.Start(subName);
-
-        return sub;
+        // for now try just letting it auto-start
     }
 
     public void Dispose()
     {
-        _reader.Dispose();
-        _monitor.Dispose();
+        _monitorProvider.Dispose();
     }
 }

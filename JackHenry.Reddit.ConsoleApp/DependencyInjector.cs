@@ -19,23 +19,25 @@ public class DependencyInjector
         services.AddTransient<IRedditReader, RedditClientReader>();
         services.AddTransient<IRedditMonitor, RedditClientMonitor>();
         //services.AddTransient<IRedditReader, RedditApiReader>();
+        services.AddTransient<Provider<IRedditMonitor>>(sp => new(sp.GetRequiredService<IRedditMonitor>));
 
-        services.AddTransient<RedditAggregator>();
-        services.AddTransient<IRedditAggregator>(sp =>
-        {
-            var s = sp.GetRequiredService<RedditAggregator>();
-            s.Include(new NewPostAggregation(),
-                      CreateReporter<PostSummary>((p, i) => $"New Post by {p.Username}: {p.Title}"));
-            s.Include(new TopUserAggregation(),
-                      CreateReporter<UserHandle>((u, i) => $"#{i + 1} {u.Username}"),
-                      5);
-            s.Include(new TopPostAggregation(),
-                      CreateReporter<PostSummary>((p, i) => $"#{i + 1} {p.UpvoteCount,5} - {p.Title}"),
-                      3);
-            return s;
-        });
+        services.AddTransient<IRedditAggregator, RedditAggregator>();
 
         services.AddTransient<RedditWatcher>();
+        services.AddTransient<RedditService>();
+    }
+
+    public static void AddDefaultAggregations(RedditService s, Filter filter)
+    {
+        s.Aggregate<PostSummary, NewPostAggregation>(filter,
+                  CreateReporter<PostSummary>((p, i) => $"New Post by {p.Username}: {p.Title}")
+                  );
+        s.Aggregate<UserHandle, TopUserAggregation>(filter,
+                  CreateReporter<UserHandle>((u, i) => $"#{i + 1} {u.Username}"),
+                  5);
+        s.Aggregate<PostSummary, TopPostAggregation>(filter,
+                  CreateReporter<PostSummary>((p, i) => $"#{i + 1} {p.UpvoteCount,5} - {p.Title}"),
+                  3);
     }
 
     private static IAggregationReporter<T> CreateReporter<T>(Func<T, int, string> format)

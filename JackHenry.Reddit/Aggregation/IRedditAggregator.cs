@@ -1,9 +1,6 @@
-﻿using JackHenry.Reddit.Reporting;
-
-namespace JackHenry.Reddit.Aggregation;
+﻿namespace JackHenry.Reddit.Aggregation;
 
 public interface IRedditAggregator
 {
-    void Include<T>(IAggregation<T> aggregation, IAggregationReporter<T> reporter, int? count = null);
-    SubredditSummary Start(string subreddit);
+    void Include<T>(Filter filter, IAggregation<T> aggregation);
 }

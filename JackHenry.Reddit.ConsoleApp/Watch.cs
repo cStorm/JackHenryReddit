@@ -31,9 +31,13 @@ public class Watch : ICommand
     {
         if (Subreddit == null) throw new ArgumentNullException(nameof(Subreddit));
 
-        var service = serviceProvider.GetRequiredService<IRedditAggregator>();
+        var service = serviceProvider.GetRequiredService<RedditService>();
+        SubredditSummary subreddit = service.GetSubreddit(Subreddit);
+        {
+            var filter = new Filter(Subreddit, null);
+            DependencyInjector.AddDefaultAggregations(service, filter);
+        }
 
-        SubredditSummary subreddit = service.Start(Subreddit);
         Console.WriteLine($"Now watching {subreddit.Name}");
         Console.WriteLine(subreddit.Description);
 

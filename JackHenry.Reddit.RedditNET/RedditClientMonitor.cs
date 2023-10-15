@@ -25,11 +25,12 @@ public class RedditClientMonitor : IRedditMonitor
 
     private static PostSummary CreatePostSummary(Post post) => new(post.Author, post.Title, post.Id, post.UpVotes);
 
-    public void Start(string subName)
+    public void Start(string subName, DateTime? oldest = null)
     {
         if (_sub != null) throw new InvalidOperationException("Already running");
 
         _sub = _client.Subreddit(subName).About();
+        _oldest = oldest;
         _sub.Posts.NewUpdated += (sender, e) =>
         {
             var added = e.Added.Select(AddPost).ToArray();

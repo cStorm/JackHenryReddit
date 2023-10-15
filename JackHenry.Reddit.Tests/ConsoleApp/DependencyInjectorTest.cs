@@ -11,6 +11,7 @@ public class DependencyInjectorTest
     [Theory]
     [InlineData(typeof(Authorizer))]
     [InlineData(typeof(RedditWatcher))]
+    [InlineData(typeof(RedditService))]
     public void CanInjectServices(Type type)
     {
         ServiceCollection services = new();
