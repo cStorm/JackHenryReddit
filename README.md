@@ -14,6 +14,11 @@ Monitor specific subreddit:
 > dotnet run  watch AskReddit <api-app-id> [<api-app-secret>] --refresh <api-refresh-token>
 ```
 
+Include posts from the last week:
+```shell
+> dotnet run  watch AskReddit <api-app-id> --refresh <api-refresh-token> --days 7
+```
+
 ## Programming Assignment (Requirements)
 
 Your app should consume the posts from your chosen subreddit in near real time and keep track of the following statistics between the time your application starts until it ends:

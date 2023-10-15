@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using JackHenry.Reddit.Aggregation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JackHenry.Reddit.ConsoleApp;
@@ -19,6 +18,11 @@ public class Watch : ICommand
     [Option('r', "refresh", MetaValue = "refresh-token", Required = true)]
     public string? RefreshToken { get; set; }
 
+    [Option('d', "days")]
+    public int? Days { get; set; }
+
+    private DateTime? GetOldest() => DateTime.UtcNow.AddDays(-Days ?? 0);
+
     public void Configure(ServiceCollection services)
     {
         if (AppId == null) throw new ArgumentNullException(nameof(AppId));
@@ -34,7 +38,7 @@ public class Watch : ICommand
         var service = serviceProvider.GetRequiredService<RedditService>();
         SubredditSummary subreddit = service.GetSubreddit(Subreddit);
         {
-            var filter = new Filter(Subreddit, null);
+            var filter = new Filter(Subreddit, GetOldest());
             DependencyInjector.AddDefaultAggregations(service, filter);
         }
 
