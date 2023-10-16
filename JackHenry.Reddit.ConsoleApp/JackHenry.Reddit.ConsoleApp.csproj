@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+	  <ProjectReference Include="..\JackHenry.Reddit.Api\JackHenry.Reddit.Api.csproj" />
 	  <ProjectReference Include="..\JackHenry.Reddit\JackHenry.Reddit.csproj" />
 	  <ProjectReference Include="..\JackHenry.Reddit.RedditNET\JackHenry.Reddit.RedditNET.csproj" />
   </ItemGroup>

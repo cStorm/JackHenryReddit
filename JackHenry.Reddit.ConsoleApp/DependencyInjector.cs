@@ -16,9 +16,11 @@ public class DependencyInjector
     public void Inject(ServiceCollection services)
     {
         services.AddTransient<Authorizer>();
-        services.AddTransient<IRedditReader, RedditClientReader>();
+
+        //services.AddTransient<IRedditReader, RedditClientReader>();
+        services.AddTransient<IRedditReader, RedditApiReader>();
+
         services.AddTransient<IRedditMonitor, RedditMonitor>();
-        //services.AddTransient<IRedditReader, RedditApiReader>();
         services.AddTransient<Provider<IRedditMonitor>>(sp => new(sp.GetRequiredService<IRedditMonitor>));
 
         services.AddTransient<IRedditAggregator, RedditAggregator>();

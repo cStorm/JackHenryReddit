@@ -14,7 +14,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JackHenry.Reddit", "JackHen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JackHenry.Reddit.Tests", "JackHenry.Reddit.Tests\JackHenry.Reddit.Tests.csproj", "{97E5E32E-1796-4E04-B856-142A9F02CA5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JackHenry.Reddit.RedditNET", "JackHenry.Reddit.RedditNET\JackHenry.Reddit.RedditNET.csproj", "{6707F099-B159-4257-B4D2-3A4FA230DF96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JackHenry.Reddit.RedditNET", "JackHenry.Reddit.RedditNET\JackHenry.Reddit.RedditNET.csproj", "{6707F099-B159-4257-B4D2-3A4FA230DF96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JackHenry.Reddit.Api", "JackHenry.Reddit.Api\JackHenry.Reddit.Api.csproj", "{6B1708DA-C54E-477F-AD8E-3CC2CF8B15A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{6707F099-B159-4257-B4D2-3A4FA230DF96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6707F099-B159-4257-B4D2-3A4FA230DF96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6707F099-B159-4257-B4D2-3A4FA230DF96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B1708DA-C54E-477F-AD8E-3CC2CF8B15A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B1708DA-C54E-477F-AD8E-3CC2CF8B15A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B1708DA-C54E-477F-AD8E-3CC2CF8B15A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B1708DA-C54E-477F-AD8E-3CC2CF8B15A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
