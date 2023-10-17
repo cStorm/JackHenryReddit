@@ -10,7 +10,7 @@ public class RedditApiReader : IRedditReader
 
     public RedditApiReader(ApiCredentials credentials)
     {
-        _apiClient = new HttpApiClient(credentials);
+        _apiClient = new HttpApiClient(credentials, new Throttle());
         //_apiClient = new RestSharpApiClient(credentials);
     }
 
@@ -23,20 +23,24 @@ public class RedditApiReader : IRedditReader
 
     public IIncrementalReader<PostSummary> GetLatestPosts(string subreddit, DateTime? oldest)
     {
+        return GetLatestPosts(subreddit, oldest, default);
+    }
+    public IIncrementalReader<PostSummary> GetLatestPosts(string subreddit, DateTime? oldest, CancellationToken cancellationToken = default)
+    {
         PageReader<PostData, string> pager = new(
             after =>
             {
-                Task<IEnumerable<PostData>> task = GetListingAsync<PostData>($"r/{subreddit}/new?after={after}&limit={_limit}");
+                Task<IEnumerable<PostData>> task = GetListingAsync<PostData>($"r/{subreddit}/new?after={after}&limit={_limit}", cancellationToken);
                 return task.Result;
             },
             p => p.name,
-            p => p.GetCreated() < oldest);
+            p => cancellationToken.IsCancellationRequested || p.GetCreated() < oldest);
         return new IncrementalPageReader<PostData, PostSummary>(pager, p => p.CreatePostSummary());
     }
 
-    private async Task<IEnumerable<T>> GetListingAsync<T>(string url)
+    private async Task<IEnumerable<T>> GetListingAsync<T>(string url, CancellationToken cancellationToken = default)
     {
-        var container = await _apiClient.GetAsync<Container<Listing<Container<T>>>>(url);
+        var container = await _apiClient.GetAsync<Container<Listing<Container<T>>>>(url, cancellationToken);
         return container.data.children.Select(c => c.data);
     }
 

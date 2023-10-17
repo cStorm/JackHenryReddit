@@ -34,14 +34,14 @@ public abstract class ApiClient
         }
     }
 
-    public async Task<T> GetAsync<T>(string url)
+    public async Task<T> GetAsync<T>(string url, CancellationToken cancellationToken = default)
     {
         await EnsureAccessToken();
         await EnsureInitialized();
-        return await GetObjectAsync<T>(url);
+        return await GetObjectAsync<T>(url, cancellationToken);
     }
 
     protected abstract Task<AuthContract> ExchangeRefreshToken(string baseUrl, string url, string authorization, string contentType);
     protected abstract Task EnsureInitialized();
-    protected abstract Task<T> GetObjectAsync<T>(string url);
+    protected abstract Task<T> GetObjectAsync<T>(string url, CancellationToken cancellationToken);
 }

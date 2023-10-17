@@ -1,4 +1,5 @@
 ﻿using JackHenry.Reddit.Api.Contracts;
+using System.Net;
 using System.Text.Json;
 
 namespace JackHenry.Reddit.Api.Http;
@@ -6,10 +7,12 @@ namespace JackHenry.Reddit.Api.Http;
 public class HttpApiClient : ApiClient, IDisposable
 {
     private readonly HttpClient _client;
+    private readonly IThrottle _throttle;
 
-    public HttpApiClient(ApiCredentials credentials) : base(credentials)
+    public HttpApiClient(ApiCredentials credentials, IThrottle? throttle = null) : base(credentials)
     {
         _client = CreateHttpClient();
+        _throttle = throttle ?? new NullThrottle();
     }
 
     private HttpClient CreateHttpClient(string? baseUrl = null)
@@ -40,9 +43,13 @@ public class HttpApiClient : ApiClient, IDisposable
         return Task.CompletedTask;
     }
 
-    protected override async Task<T> GetObjectAsync<T>(string url)
+    protected override async Task<T> GetObjectAsync<T>(string url, CancellationToken cancellationToken)
     {
-        using HttpResponseMessage response = await _client.GetAsync(url);
+        await _throttle.WaitAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        using HttpResponseMessage response = await _client.GetAsync(url, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         VerifyResponseMessage(response);
 
         return await DeserializeAsync<T>(response);
@@ -56,12 +63,17 @@ public class HttpApiClient : ApiClient, IDisposable
 
     private void VerifyResponseMessage(HttpResponseMessage response)
     {
+        if (response.StatusCode != HttpStatusCode.InternalServerError)
+            _throttle.UpdateBandwidth(
+                (int)decimal.Parse(response.GetHeader("x-ratelimit-remaining")!),
+                int.Parse(response.GetHeader("x-ratelimit-used")!),
+                int.Parse(response.GetHeader("x-ratelimit-reset")!));
         response.EnsureSuccessStatusCode();
-        int remaining = (int)decimal.Parse(response.GetHeader("x-ratelimit-remaining")!);
     }
 
     public void Dispose()
     {
         _client.Dispose();
+        (_throttle as IDisposable)?.Dispose();
     }
 }
